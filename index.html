@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Petualangan Mimo: Transformasi Matriks</title>
+<style>
+:root{--bg:#fff7e6;--card:#ffffff;--ink:#2b2340;--sub:#6b6385;--pri:#7c5cff;--pri2:#ffd166;--ok:#2fbf71;--bad:#ef5b5b;--line:#eadfff;--hl:#fff1b8;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1c1830;--card:#2a2444;--ink:#f4efff;--sub:#b3a9d6;--line:#3d3563;--hl:#4a3f10;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#1c1830;--card:#2a2444;--ink:#f4efff;--sub:#b3a9d6;--line:#3d3563;--hl:#4a3f10;color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Nunito","Trebuchet MS",system-ui,sans-serif;line-height:1.45}
+.wrap{max-width:560px;margin:0 auto;padding:16px}
+h1{font-size:1.6rem;margin:.2rem 0;text-align:center}
+.card{background:var(--card);border:2px solid var(--line);border-radius:20px;padding:18px;margin-top:12px;box-shadow:0 6px 0 var(--line)}
+.sub{color:var(--sub);text-align:center;margin:.2rem 0 0}
+input[type=text]{width:100%;font:inherit;font-size:1.1rem;padding:12px 14px;border-radius:14px;border:2px solid var(--line);background:var(--bg);color:var(--ink);margin-top:10px}
+input:focus{outline:3px solid var(--pri2)}
+button{font:inherit;font-weight:800;border:0;border-radius:14px;padding:12px 18px;cursor:pointer;background:var(--pri);color:#fff;width:100%;margin-top:12px;font-size:1.05rem;box-shadow:0 4px 0 rgba(0,0,0,.2)}
+button:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(0,0,0,.2)}
+button:disabled{opacity:.5;cursor:default}
+.opt{background:var(--bg);color:var(--ink);border:2px solid var(--line);box-shadow:none;text-align:left;margin-top:8px}
+.opt.ok{background:var(--ok);color:#fff;border-color:var(--ok)}
+.opt.bad{background:var(--bad);color:#fff;border-color:var(--bad)}
+.hide{display:none}
+.mimo{display:block;margin:0 auto;width:130px;height:130px}
+.bounce{animation:b 1.6s ease-in-out infinite}
+@keyframes b{50%{transform:translateY(-8px)}}
+.shake{animation:s .4s}
+@keyframes s{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.bubble{background:var(--hl);border-radius:16px;padding:10px 14px;text-align:center;font-weight:700;margin-top:4px}
+.bar{height:10px;background:var(--line);border-radius:8px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--pri2);transition:width .3s}
+.meta{display:flex;justify-content:space-between;font-weight:800;color:var(--sub);font-size:.9rem;margin:8px 0 4px}
+.q{font-size:1.1rem;font-weight:700;margin:10px 0}
+.mx{display:inline-grid;grid-auto-flow:column;grid-template-rows:repeat(2,auto);gap:2px 12px;padding:2px 8px;border-left:2px solid currentColor;border-right:2px solid currentColor;border-radius:6px;vertical-align:middle;text-align:center}
+.exp{margin-top:10px;padding:10px 12px;border-radius:12px;background:var(--bg);font-size:.95rem}
+.score{font-size:3rem;font-weight:900;text-align:center;color:var(--pri);margin:0}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;margin-top:8px}
+th,td{padding:8px 6px;text-align:left;border-bottom:1px solid var(--line)}
+th{color:var(--sub);font-size:.85rem}
+tr.me td{background:var(--hl);font-weight:800}
+td:first-child,th:first-child{width:3.2em;text-align:center}
+.note{font-size:.85rem;color:var(--sub);margin-top:8px;text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>🌟 Petualangan Mimo 🌟</h1>
+<p class="sub">Kuis Transformasi Matriks</p>
+<svg id="mimo" class="mimo bounce" viewBox="0 0 130 130" aria-label="Mimo">
+ <ellipse cx="65" cy="118" rx="34" ry="6" fill="rgba(0,0,0,.12)"/>
+ <path d="M30 60 Q30 20 65 20 Q100 20 100 60 Q104 105 65 108 Q26 105 30 60Z" fill="#9b8bff" stroke="#6a52e0" stroke-width="3"/>
+ <path d="M46 22 L40 6 L56 16Z M84 22 L90 6 L74 16Z" fill="#ffd166" stroke="#e0a526" stroke-width="2"/>
+ <ellipse cx="50" cy="58" rx="10" ry="12" fill="#fff"/><ellipse cx="80" cy="58" rx="10" ry="12" fill="#fff"/>
+ <circle id="pl" cx="52" cy="60" r="5.5" fill="#2b2340"/><circle id="pr" cx="78" cy="60" r="5.5" fill="#2b2340"/>
+ <circle cx="54" cy="57" r="1.8" fill="#fff"/><circle cx="80" cy="57" r="1.8" fill="#fff"/>
+ <circle cx="38" cy="76" r="6" fill="#ff9bb3" opacity=".7"/><circle cx="92" cy="76" r="6" fill="#ff9bb3" opacity=".7"/>
+ <path id="mouth" d="M55 82 Q65 92 75 82" fill="none" stroke="#2b2340" stroke-width="3.5" stroke-linecap="round"/>
+</svg>
+<div id="say" class="bubble">Halo! Aku Mimo si Matriks. Siapa namamu?</div>
+
+<section id="s-name" class="card">
+ <label for="nm" style="font-weight:800">Isi namamu dulu ya (wajib)</label>
+ <input id="nm" type="text" maxlength="20" placeholder="Contoh: Budi" autocomplete="off">
+ <div id="nmErr" class="note hide" style="color:var(--bad)">Nama harus diisi dulu ya!</div>
+ <button id="go">Mulai Bermain 🚀</button>
+ <p class="note">5 soal • tiap soal benar bernilai 20 poin</p>
+</section>
+
+<section id="s-quiz" class="card hide">
+ <div class="meta"><span id="no">Soal 1/5</span><span id="sc">Skor: 0</span></div>
+ <div class="bar"><i id="pg" style="width:0"></i></div>
+ <div id="q" class="q"></div>
+ <div id="opts"></div>
+ <div id="exp" class="exp hide"></div>
+ <button id="next" class="hide">Lanjut ➡️</button>
+</section>
+
+<section id="s-end" class="hide">
+ <div class="card">
+  <p class="sub" id="endName"></p>
+  <p class="score" id="finalScore">0</p>
+  <p class="sub" id="endMsg"></p>
+  <p class="note" id="onceNote">Setiap pemain hanya bisa bermain satu kali. 🔒</p>
+ </div>
+ <div class="card">
+  <strong>🏆 Peringkat Pemain</strong>
+  <div class="tw"><table><thead><tr><th>Peringkat</th><th>Nama</th><th>Skor</th><th>Waktu</th></tr></thead><tbody id="board"></tbody></table></div>
+  <div id="boardNote" class="note"></div>
+ </div>
+</section>
+</div>
+
+<script>
+var $=function(i){return document.getElementById(i)};
+function mat(a,b,c,d){return '<span class="mx"><span>'+a+'</span><span>'+c+'</span><span>'+b+'</span><span>'+d+'</span></span>'}
+function col(x,y){return '<span class="mx" style="grid-template-rows:repeat(2,auto)"><span>'+x+'</span><span>'+y+'</span></span>'}
+var QS=[
+ {q:'<b>Translasi.</b> Titik A(2, 3) ditranslasikan oleh T = ('+'−4, 5). Koordinat bayangan A′ adalah …',
+  o:['(−2, 8)','(6, −2)','(−2, −2)','(6, 8)'],a:0,
+  e:'A′ = (2 + (−4), 3 + 5) = (−2, 8).'},
+ {q:'<b>Refleksi.</b> Titik P(4, −3) dicerminkan terhadap sumbu-x. Bayangannya adalah …',
+  o:['(4, 3)','(−4, −3)','(−4, 3)','(−3, 4)'],a:0,
+  e:'Pencerminan terhadap sumbu-x mengubah (x, y) menjadi (x, −y), jadi (4, 3).'},
+ {q:'<b>Rotasi.</b> Titik B(3, 1) diputar 90° berlawanan arah jarum jam terhadap titik pusat O(0, 0). Bayangannya adalah …',
+  o:['(−1, 3)','(1, −3)','(−3, −1)','(3, −1)'],a:0,
+  e:'Rotasi 90° berlawanan arah jarum jam: (x, y) → (−y, x), jadi (3, 1) → (−1, 3).'},
+ {q:'<b>Dilatasi.</b> Titik C(−2, 5) didilatasi dengan pusat O(0, 0) dan faktor skala 3. Bayangannya adalah …',
+  o:['(−6, 15)','(6, −15)','(1, 8)','(−6, 8)'],a:0,
+  e:'Dilatasi [O, k]: (x, y) → (kx, ky) = (3 · (−2), 3 · 5) = (−6, 15).'},
+ {q:'<b>Matriks transformasi.</b> Titik D(2, 1) ditransformasikan oleh matriks '+mat(2,1,0,3)+' . Bayangan D′ adalah …',
+  o:['(5, 3)','(4, 3)','(5, 1)','(3, 5)'],a:0,
+  e:'Kalikan matriks dengan vektor kolom: x′ = 2·2 + 1·1 = 5 dan y′ = 0·2 + 3·1 = 3. Jadi D′(5, 3).'}
+];
+var st={name:'',i:0,score:0,t0:0,order:[],done:false};
+var face={
+ happy:{m:'M55 82 Q65 94 75 82',y:60},sad:{m:'M55 90 Q65 80 75 90',y:63},neutral:{m:'M57 86 L73 86',y:60},wow:{m:'M58 84 Q65 98 72 84 Z',y:58}
+};
+function setFace(k,txt){var f=face[k];$('mouth').setAttribute('d',f.m);$('pl').setAttribute('cy',f.y);$('pr').setAttribute('cy',f.y);if(txt)$('say').textContent=txt}
+function anim(c){var m=$('mimo');m.classList.remove('shake','bounce');void m.getBoundingClientRect();m.classList.add(c);if(c==='shake')setTimeout(function(){m.classList.add('bounce');m.classList.remove('shake')},450)}
+function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}return a}
+function show(id){['s-name','s-quiz','s-end'].forEach(function(x){$(x).classList.toggle('hide',x!==id)})}
+
+$('go').onclick=start;
+$('nm').onkeydown=function(e){if(e.key==='Enter')start()};
+function start(){
+ if(played)return;
+ var n=$('nm').value.trim();
+ if(!n){$('nmErr').classList.remove('hide');setFace('sad','Eh, namamu belum diisi nih!');anim('shake');return}
+ $('nmErr').classList.add('hide');
+ st={name:n,i:0,score:0,t0:Date.now(),order:[],done:false};
+ show('s-quiz');setFace('happy','Semangat, '+n+'! Yuk kita mulai!');
+ load();
+}
+function load(){
+ var Q=QS[st.i];
+ $('no').textContent='Soal '+(st.i+1)+'/5';$('sc').textContent='Skor: '+st.score;
+ $('pg').style.width=(st.i/5*100)+'%';
+ $('q').innerHTML=Q.q;
+ var idx=shuffle(Q.o.map(function(_,k){return k}));
+ var box=$('opts');box.innerHTML='';
+ idx.forEach(function(k){
+  var b=document.createElement('button');b.className='opt';b.textContent=Q.o[k];
+  b.onclick=function(){pick(b,k===Q.a)};b.dataset.right=(k===Q.a)?'1':'0';
+  box.appendChild(b);
+ });
+ $('exp').classList.add('hide');$('next').classList.add('hide');
+}
+function pick(btn,ok){
+ var all=$('opts').children;
+ for(var i=0;i<all.length;i++){all[i].disabled=true;if(all[i].dataset.right==='1')all[i].classList.add('ok')}
+ if(ok){st.score+=20;setFace('wow','Hore, benar! Kamu hebat! 🎉');anim('bounce')}
+ else{btn.classList.add('bad');setFace('sad','Yah, belum tepat. Tenang, kita belajar lagi ya!');anim('shake')}
+ $('sc').textContent='Skor: '+st.score;
+ $('exp').textContent='Pembahasan: '+QS[st.i].e;$('exp').classList.remove('hide');
+ $('next').textContent=st.i===4?'Lihat Hasil 🏁':'Lanjut ➡️';$('next').classList.remove('hide');
+}
+$('next').onclick=function(){
+ if(st.i<4){st.i++;setFace('neutral','Soal berikutnya, ayo fokus!');load()}else finish();
+};
+
+var dbc=null,dbRows=[],savedOk=false,me=null,sub=false,local=[],uid=null,played=false;
+function initDb(){
+ try{
+  if(typeof claude==='undefined'||!claude.use)return;
+  Promise.all([claude.use('db'),claude.use('user')]).then(function(r){dbc=r[0];var u=r[1];return (u&&u.id?Promise.resolve(u.id()):Promise.resolve(null)).then(function(id){uid=id;if(!$('s-end').classList.contains('hide'))attach();checkPlayed()})}).catch(function(){});
+ }catch(e){}
+}
+initDb();
+function attach(){
+ if(!dbc||sub)return;sub=true;
+ try{
+  dbc.collection('scores').orderBy('score','desc').limit(100).onSnapshot(function(s){
+   dbRows=s.docs.map(function(d){return d.data()});render();
+  },function(){render()});
+ }catch(e){render()}
+}
+function fmt(s){var m=Math.floor(s/60),r=s%60;return m+':'+(r<10?'0':'')+r}
+function finish(){
+ var secs=Math.round((Date.now()-st.t0)/1000);
+ me={name:st.name,score:st.score,time:secs,ts:Date.now()};
+ $('pg').style.width='100%';show('s-end');
+ $('endName').textContent='Kerja bagus, '+st.name+'!';
+ $('finalScore').textContent=st.score+' / 100';
+ var msg=st.score===100?'Sempurna! Kamu jagoan matriks! 🏆':st.score>=60?'Keren! Sedikit lagi jadi master! ⭐':'Jangan menyerah, coba lagi ya! 💪';
+ $('endMsg').textContent=msg;
+ setFace(st.score>=60?'wow':'happy',st.score>=60?'Yeay! Aku bangga padamu!':'Ayo main lagi, pasti bisa!');
+ played=true;savedOk=false;local.push(me);render();
+ try{localStorage.setItem('mimo_done',JSON.stringify(me))}catch(e){}
+ if(dbc){
+  try{var ref=uid?dbc.doc('scores/'+uid):dbc.collection('scores').doc();ref.set(me).then(function(){savedOk=true;attach();render()}).catch(function(){attach();render()})}catch(e){render()}
+ }
+}
+function checkPlayed(){
+ if(played||!dbc||!uid)return;
+ try{dbc.doc('scores/'+uid).get().then(function(s){var ex=(typeof s.exists==='function')?s.exists():s.exists;if(ex&&!played)showDone(s.data(),true)}).catch(function(){})}catch(e){}
+}
+function showDone(d,fromDb){
+ if(!d||typeof d.score!=='number')return;
+ me=d;played=true;st.name=d.name;
+ if(fromDb)savedOk=true;else{savedOk=false;local.push(d)}
+ show('s-end');
+ $('endName').textContent='Kamu sudah bermain, '+d.name+'!';
+ $('finalScore').textContent=d.score+' / 100';
+ $('endMsg').textContent=d.score===100?'Sempurna! Kamu jagoan matriks! 🏆':d.score>=60?'Keren! Sedikit lagi jadi master! ⭐':'Terima kasih sudah bermain, tetap semangat belajar! 💪';
+ setFace(d.score>=60?'wow':'happy','Terima kasih sudah bermain!');
+ attach();render();
+}
+function render(){
+ if(!me)return;
+ var rows=dbRows.slice();
+ if(!savedOk){local.forEach(function(l){if(!dbRows.some(function(r){return r.ts===l.ts&&r.name===l.name}))rows.push(l)})}
+ rows.sort(function(a,b){return b.score-a.score||a.time-b.time||a.ts-b.ts});
+ var body=$('board');body.innerHTML='';
+ var medals=['🥇','🥈','🥉'];
+ rows.slice(0,50).forEach(function(r,i){
+  var tr=document.createElement('tr');if(r.ts===me.ts&&r.name===me.name)tr.className='me';
+  [medals[i]||String(i+1),r.name,String(r.score),fmt(r.time)].forEach(function(v){var td=document.createElement('td');td.textContent=v;tr.appendChild(td)});
+  body.appendChild(tr);
+ });
+ $('boardNote').textContent=savedOk?'Peringkat urut dari skor tertinggi; jika sama, yang tercepat di atas.':'Skormu tampil di tabel ini. Tabel bersama hanya menyimpan skor pemain yang punya akses Contributor.';
+}
+try{var prev=localStorage.getItem('mimo_done');if(prev)showDone(JSON.parse(prev),false)}catch(e){}
+</script>
+</body>
+</html>
